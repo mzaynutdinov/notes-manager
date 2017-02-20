@@ -1,0 +1,14 @@
+spring:
+  mvc:
+    view:
+      prefix: /WEB-INF/jsp/
+      suffix: .jsp
+
+#  datasource:
+#    url: jdbc:postgresql://192.168.99.100:5432/testdb
+#    username: notesmanager
+#    password: test123
+
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
