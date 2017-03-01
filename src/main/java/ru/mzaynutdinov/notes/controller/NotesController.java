@@ -3,10 +3,10 @@ package ru.mzaynutdinov.notes.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
-import ru.mzaynutdinov.notes.logic.NotesLogic;
 import ru.mzaynutdinov.notes.dto.NoteDto;
 import ru.mzaynutdinov.notes.dto.ResponseDto;
 import ru.mzaynutdinov.notes.entity.Note;
+import ru.mzaynutdinov.notes.logic.NotesLogic;
 import ru.mzaynutdinov.notes.utils.ApiException;
 
 import java.text.ParseException;
@@ -19,6 +19,9 @@ import java.util.List;
 public class NotesController {
     @Autowired
     NotesLogic notesLogic;
+
+    SimpleDateFormat sdfFull = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
+    SimpleDateFormat sdfShort = new SimpleDateFormat("dd.MM.yyyy");
 
     /**
      * Возвращает список записей с (или без) фильтрацией по строке из заголовка и/или текста
@@ -135,30 +138,19 @@ public class NotesController {
         Date startDate = new Date(0);
         Date endDate = new Date();
 
-        SimpleDateFormat sdfFull = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
-        SimpleDateFormat sdfShort = new SimpleDateFormat("dd.MM.yyyy");
-
         if (startDateStr != null && !startDateStr.trim().isEmpty()) {
             try {
-                startDate = sdfFull.parse(startDateStr);
+                startDate = parseDate(startDateStr);
             } catch (ParseException e) {
-                try {
-                    startDate = sdfShort.parse(startDateStr);
-                } catch (ParseException e1) {
-                    throw new ApiException(ApiException.Type.INCORRECT_START_DATE_FORMAT);
-                }
+                throw new ApiException(ApiException.Type.INCORRECT_START_DATE_FORMAT);
             }
         }
 
         if (endDateStr != null && !endDateStr.trim().isEmpty()) {
             try {
-                endDate = sdfFull.parse(endDateStr);
+                endDate = parseDate(endDateStr);
             } catch (ParseException e) {
-                try {
-                    endDate = sdfShort.parse(endDateStr);
-                } catch (ParseException e1) {
-                    throw new ApiException(ApiException.Type.INCORRECT_END_DATE_FORMAT);
-                }
+                throw new ApiException(ApiException.Type.INCORRECT_END_DATE_FORMAT);
             }
         }
 
@@ -172,5 +164,16 @@ public class NotesController {
         ));
 
         return dto;
+    }
+
+    /**
+     * Парсит строковое представление даты <code>dateStr</code>
+     */
+    private Date parseDate(String dateStr) throws ParseException {
+        try {
+            return sdfFull.parse(dateStr);
+        } catch (ParseException e) {
+            return sdfShort.parse(dateStr);
+        }
     }
 }
